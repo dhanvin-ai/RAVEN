@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Env & secrets
+.env
+.env.local
+*.pem
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Node (frontend later)
+node_modules/
+.next/
+out/
+
+# Alembic
+apps/api/alembic/versions/*.pyc
+
+# Docker
+postgres-data/
