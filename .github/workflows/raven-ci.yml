@@ -1,0 +1,87 @@
+name: RAVEN Agent CI Gate
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'apps/api/app/agents/**'
+      - 'apps/api/app/services/agent_brain.py'
+      - 'apps/api/app/engine/**'
+      - 'apps/api/app/tools/**'
+  workflow_dispatch:
+    inputs:
+      agent_id:
+        description: 'Agent ID to evaluate'
+        required: true
+        default: '3'
+      fail_under:
+        description: 'Minimum reliability score %'
+        required: true
+        default: '80'
+
+jobs:
+  agent-reliability-gate:
+    name: Evaluate Agent Reliability & CI Gate
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: raven
+          POSTGRES_PASSWORD: raven_password
+          POSTGRES_DB: raven
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r apps/cli/requirements.txt
+          pip install -r apps/api/requirements.txt
+
+      - name: Start RAVEN API Server
+        env:
+          DATABASE_URL: postgresql+psycopg://raven:raven_password@localhost:5432/raven
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          cd apps/api
+          python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          # Wait for API server to become ready
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8000/health | grep -q "healthy"; then
+              echo "✅ RAVEN API is ready!"
+              break
+            fi
+            echo "Waiting for RAVEN API..."
+            sleep 2
+          done
+
+      - name: Run RAVEN Agent Benchmark Gate
+        id: raven_test
+        run: |
+          python apps/cli/raven_cli.py test \
+            --agent ${{ github.event.inputs.agent_id || '3' }} \
+            --fail-under ${{ github.event.inputs.fail_under || '80' }} \
+            --output pr-report.md
+
+      - name: Post CI Report to Pull Request
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: pr-report.md
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
