@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: raven-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: raven
+      POSTGRES_PASSWORD: raven_password
+      POSTGRES_DB: raven
+    ports:
+      - "5432:5432"
+    volumes:
+      - raven_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raven -d raven"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  raven_postgres_data:

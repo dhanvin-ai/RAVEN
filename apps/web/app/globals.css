@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+.font-editorial {
+  font-family: "Newsreader", "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+:root {
+  --background: #080809;
+  --foreground: #f4f4f5;
+
+  --sidebar: #0b0b0d;
+  --panel: #151517;
+  --panel-hover: #19191c;
+
+  --border: #252529;
+  --border-light: #303036;
+
+  --muted: #85858d;
+  --muted-dark: #5f6068;
+
+  --purple: #7565f6;
+  --purple-bright: #8b7cff;
+  --purple-dark: #5144c8;
+
+  --green: #22c77a;
+  --green-bg: rgba(34, 199, 122, 0.1);
+
+  --red: #ef5350;
+  --red-bg: rgba(239, 83, 80, 0.1);
+
+  --yellow: #e7a91b;
+  --yellow-bg: rgba(231, 169, 27, 0.12);
+
+  --cyan: #14b8d4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family:
+    "Plus Jakarta Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(117, 101, 246, 0.3);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080809;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29292e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a42;
+}
+
+/* Monospace numbers / technical data */
+
+.mono {
+  font-family:
+    "SFMono-Regular",
+    "SF Mono",
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
+
+/* Thin technical borders */
+
+.technical-border {
+  border: 1px solid var(--border);
+}
+
+/* Hide scrollbar for mobile navigation */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+/* PALLY THEME & MOTION STYLES */
+:root {
+  --pally-paper: #faf8f5;
+  --pally-ink: #161616;
+  --pally-muted: #66625d;
+  --pally-blue: #007aff;
+  --pally-blue-hover: #0062cc;
+  --pally-border: rgba(0, 0, 0, 0.08);
+  --pally-card: #ffffff;
+}
+
+@keyframes pallyFloat1 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pallyFloat2 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pallyFloat3 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes marqueeLeft {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marqueeRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes orbitSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-pally-float-1 {
+  animation: pallyFloat1 7s ease-in-out infinite;
+}
+
+.animate-pally-float-2 {
+  animation: pallyFloat2 8.5s ease-in-out infinite;
+}
+
+.animate-pally-float-3 {
+  animation: pallyFloat3 6.5s ease-in-out infinite;
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marqueeLeft 32s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marqueeRight 32s linear infinite;
+}
+
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-orbit {
+  animation: orbitSpin 35s linear infinite;
+}
+
+/* Authentic iMessage / Pally speech bubbles */
+.imsg-bubble-raven {
+  position: relative;
+  background-color: #f0ede6;
+  color: #161616;
+  border-radius: 18px 18px 18px 4px;
+}
+
+.imsg-bubble-user {
+  position: relative;
+  background-color: #007aff;
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.imsg-bubble-alert {
+  position: relative;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #cf1322;
+  border-radius: 18px;
+}
+
+.imsg-bubble-success {
+  position: relative;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+  border-radius: 18px;
+}
+
+/* MOTION GRAPHICS KEYFRAMES FOR AI STACK */
+@keyframes packetBeam {
+  0% { transform: translateY(-100%); opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateY(200%); opacity: 0; }
+}
+
+@keyframes radarScan {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes borderGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(0, 122, 255, 0.2), inset 0 0 15px rgba(0, 122, 255, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(0, 122, 255, 0.45), inset 0 0 30px rgba(0, 122, 255, 0.18);
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-packet-beam {
+  animation: packetBeam 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-radar-scan {
+  animation: radarScan 8s linear infinite;
+}
+
+.animate-border-glow-pulse {
+  animation: borderGlowPulse 4s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
