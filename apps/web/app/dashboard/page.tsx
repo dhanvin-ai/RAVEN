@@ -162,8 +162,14 @@ export default function DashboardPage() {
       setAgents(loadedAgents);
 
       const currentAgent =
+        (selectedAgent
+          ? loadedAgents.find((agent) => agent.id === selectedAgent.id)
+          : null) ||
+        loadedAgents.find((agent) =>
+          agent.name.toLowerCase().includes("customer support")
+        ) ||
         loadedAgents.find(
-          (agent) => agent.id === (selectedAgent?.id || DEFAULT_AGENT_ID)
+          (agent) => agent.id === DEFAULT_AGENT_ID
         ) ||
         loadedAgents[0] ||
         null;

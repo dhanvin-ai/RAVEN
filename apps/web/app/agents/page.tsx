@@ -121,7 +121,13 @@ export default function AgentsPage() {
       }
 
       const current =
-        agentList.find((agent) => agent.id === selectedAgentId) || agentList[0];
+        (selectedAgentId
+          ? agentList.find((agent) => agent.id === selectedAgentId)
+          : null) ||
+        agentList.find((agent) =>
+          agent.name.toLowerCase().includes("customer support")
+        ) ||
+        agentList[0];
 
       setSelectedAgentId(current.id);
       setSelectedAgent(current);

@@ -60,7 +60,8 @@ try:
     with SessionLocal() as db:
         agent_count = db.query(Agent).count()
         report_count = db.query(ReliabilityReport).count()
-        if agent_count == 0 or report_count == 0:
+        cs_agent = db.query(Agent).filter(Agent.name.ilike("%customer support%")).first()
+        if agent_count == 0 or report_count == 0 or not cs_agent:
             from app.seeds.enterprise_seed import seed_enterprise
             seed_enterprise()
 except Exception as e:
