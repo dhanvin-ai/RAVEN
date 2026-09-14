@@ -1,8 +1,6 @@
 
 # RAVEN — AI Agent Evaluation & Reliability Engine
 
-https://web-green-five-64.vercel.app/dashboard
-
 > **Test. Evaluate. Secure. Monitor. Improve.**
 
 RAVEN (Reliability Assessment & Validation Engine for AI Agents) is an AI-agent evaluation and reliability platform designed to test autonomous agents against realistic scenarios, detect failures, classify unsafe behavior, measure reliability, track regressions across versions, and execute untrusted operations inside a hardened sandbox.
@@ -11,6 +9,7 @@ As AI agents become capable of reasoning, using tools, and taking actions autono
 
 **RAVEN provides an evaluation layer between AI agents and real-world deployment.**
 
+https://web-green-five-64.vercel.app/dashboard
 ---
 
 ## Why RAVEN?
