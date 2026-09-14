@@ -84,13 +84,6 @@ docker compose ps
 
 fastapi dev app/main.py     # from apps/api
 
-## API
-
-Backend:            http://localhost:8000
-Swagger docs:       http://localhost:8000/docs
-Health check:       http://localhost:8000/health
-Database test:      http://localhost:8000/db-test
-
 ## Environment Variables
 
 Create apps/api/.env with:
