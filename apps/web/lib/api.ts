@@ -1,11 +1,11 @@
 export function getApiBaseUrl(): string {
-  // If running in browser and NOT on localhost/127.0.0.1, always route to live cloud backend
+  // If running in browser and NOT on localhost/127.0.0.1, use same-origin proxy
   if (
     typeof window !== "undefined" &&
     window.location.hostname !== "localhost" &&
     window.location.hostname !== "127.0.0.1"
   ) {
-    return "https://api-ten-iota-10.vercel.app";
+    return "/api/proxy";
   }
 
   if (process.env.NEXT_PUBLIC_API_URL) {
@@ -265,29 +265,39 @@ async function request<T>(
   options?: RequestInit
 ): Promise<T> {
   const baseUrl = getApiBaseUrl();
-  const response = await fetch(
+  const urlsToTry: string[] = [
     `${baseUrl}${endpoint}`,
-    {
-      ...options,
+    ...(baseUrl === "/api/proxy" ? [`https://api-ten-iota-10.vercel.app${endpoint}`] : []),
+  ];
 
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+  let lastError: Error | null = null;
 
-      cache: "no-store",
+  for (const url of urlsToTry) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options?.headers || {}),
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `API request failed (${response.status}): ${errorText}`
+        );
+      }
+
+      return await response.json();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      // Loop continues to fallback URL if present
     }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-      `API request failed (${response.status}): ${errorText}`
-    );
   }
 
-  return response.json();
+  throw lastError || new Error("Failed to connect to API backend");
 }
 
 

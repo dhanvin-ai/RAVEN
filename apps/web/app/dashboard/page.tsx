@@ -597,13 +597,13 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                 <span>FastAPI Engine</span>
                 <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                  {typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1" ? "api-ten-iota-10.vercel.app" : "127.0.0.1:8000"}
+                  {typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "127.0.0.1:8000" : "api-ten-iota-10.vercel.app"}
                 </span>
               </div>
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                 <span>Database Engine</span>
                 <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                  {typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1" ? "Cloud DB (Healthy)" : "Port 5432 (Healthy)"}
+                  {typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "Port 5432 (Local)" : "Cloud DB (Healthy)"}
                 </span>
               </div>
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
