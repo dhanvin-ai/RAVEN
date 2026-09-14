@@ -590,11 +590,15 @@ export default function DashboardPage() {
             <div className="space-y-2 text-[11px]">
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                 <span>FastAPI Engine</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">127.0.0.1:8000</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                  {typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1" ? "api-ten-iota-10.vercel.app" : "127.0.0.1:8000"}
+                </span>
               </div>
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                <span>PostgreSQL DB</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">Port 5432 (Healthy)</span>
+                <span>Database Engine</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                  {typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1" ? "Cloud DB (Healthy)" : "Port 5432 (Healthy)"}
+                </span>
               </div>
               <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                 <span>Ponytail Engine</span>

@@ -52,6 +52,20 @@ try:
 except Exception:
     pass
 
+# Auto-seed database if empty (ensures cloud/serverless instances have full enterprise data)
+try:
+    from app.database import SessionLocal
+    from app.models.agent import Agent
+    from app.models.reliability_report import ReliabilityReport
+    with SessionLocal() as db:
+        agent_count = db.query(Agent).count()
+        report_count = db.query(ReliabilityReport).count()
+        if agent_count == 0 or report_count == 0:
+            from app.seeds.enterprise_seed import seed_enterprise
+            seed_enterprise()
+except Exception as e:
+    print(f"Startup auto-seeding notice: {e}")
+
 
 # ─────────────────────────────────────────────
 # FASTAPI APPLICATION
@@ -75,7 +89,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://web-green-five-64.vercel.app",
     ],
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

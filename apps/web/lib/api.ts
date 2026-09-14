@@ -1,5 +1,21 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+export function getApiBaseUrl(): string {
+  // If running in browser and NOT on localhost/127.0.0.1, always route to live cloud backend
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    return "https://api-ten-iota-10.vercel.app";
+  }
+
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+  }
+
+  return "http://127.0.0.1:8000";
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 // ============================================================
 // TYPES
@@ -248,8 +264,9 @@ async function request<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
+  const baseUrl = getApiBaseUrl();
   const response = await fetch(
-    `${API_BASE_URL}${endpoint}`,
+    `${baseUrl}${endpoint}`,
     {
       ...options,
 

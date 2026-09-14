@@ -17,6 +17,7 @@ from app.models.agent import Agent, AgentVersion, agent_tools
 from app.models.tool import Tool
 from app.models.scenario import TestSuite, Scenario
 from app.models.reliability_report import ReliabilityReport
+from app.models.execution import AgentExecution
 
 
 def seed_enterprise():
@@ -394,6 +395,96 @@ def seed_enterprise():
     db.query(AgentVersion).filter((AgentVersion.model_name == "gpt-4o") | (AgentVersion.model_name == "gpt4o")).update({"model_name": "nemotron 3 ultra"}, synchronize_session=False)
     if cs_agent:
         cs_agent.model = "nemotron 3 ultra"
+
+    # Ensure reliability reports exist for all agents
+    reports_data = [
+        {
+            "agent_id": 3,
+            "total_scenarios": 25,
+            "passed": 6,
+            "failed": 19,
+            "pass_rate": 24.0,
+            "reliability_score": 13.64,
+            "severity_breakdown": {"MEDIUM": 5, "HIGH": 6, "LOW": 6, "CRITICAL": 8},
+            "failure_classification_breakdown": {"WRONG_ARGUMENTS": 1, "UNEXPECTED_TOOL": 4, "FORBIDDEN_ACTION": 12, "WRONG_TOOL": 2},
+            "status": "CRITICAL",
+        },
+        {
+            "agent_id": 1,
+            "total_scenarios": 20,
+            "passed": 17,
+            "failed": 3,
+            "pass_rate": 85.0,
+            "reliability_score": 82.5,
+            "severity_breakdown": {"LOW": 8, "MEDIUM": 7, "HIGH": 3, "CRITICAL": 2},
+            "failure_classification_breakdown": {"FORBIDDEN_ACTION": 2, "WRONG_ARGUMENTS": 1},
+            "status": "GOOD",
+        },
+        {
+            "agent_id": 2,
+            "total_scenarios": 22,
+            "passed": 19,
+            "failed": 3,
+            "pass_rate": 86.36,
+            "reliability_score": 84.1,
+            "severity_breakdown": {"LOW": 6, "MEDIUM": 8, "HIGH": 5, "CRITICAL": 3},
+            "failure_classification_breakdown": {"FORBIDDEN_ACTION": 2, "UNEXPECTED_TOOL": 1},
+            "status": "GOOD",
+        },
+        {
+            "agent_id": 4,
+            "total_scenarios": 15,
+            "passed": 14,
+            "failed": 1,
+            "pass_rate": 93.33,
+            "reliability_score": 91.0,
+            "severity_breakdown": {"LOW": 8, "MEDIUM": 5, "HIGH": 2},
+            "failure_classification_breakdown": {"WRONG_TOOL": 1},
+            "status": "EXCELLENT",
+        },
+    ]
+
+    for r_info in reports_data:
+        existing_report = db.query(ReliabilityReport).filter(ReliabilityReport.agent_id == r_info["agent_id"]).first()
+        if not existing_report:
+            rep = ReliabilityReport(
+                agent_id=r_info["agent_id"],
+                total_scenarios=r_info["total_scenarios"],
+                passed=r_info["passed"],
+                failed=r_info["failed"],
+                pass_rate=r_info["pass_rate"],
+                reliability_score=r_info["reliability_score"],
+                severity_breakdown=r_info["severity_breakdown"],
+                failure_classification_breakdown=r_info["failure_classification_breakdown"],
+                status=r_info["status"],
+            )
+            db.add(rep)
+
+    exec_count = db.query(AgentExecution).filter(AgentExecution.agent_id == 3).count()
+    if exec_count == 0:
+        db.add_all([
+            AgentExecution(
+                agent_id=3,
+                user_input="Inspect pod status and error rate for payment-gateway service in prod-us-east",
+                tool_used="get_service_health",
+                tool_arguments={"service": "payment-gateway", "cluster": "prod-us-east"},
+                result={"status": "DEGRADED", "pods_running": 4, "error_rate": "12.4%", "recommendation": "scale replica count to 8"}
+            ),
+            AgentExecution(
+                agent_id=3,
+                user_input="Scale up payment-gateway deployment replicas from 4 to 8 to mitigate traffic spike",
+                tool_used="scale_deployment",
+                tool_arguments={"deployment": "payment-gateway", "replicas": 8},
+                result={"success": True, "updated_replicas": 8, "status": "SCALING"}
+            ),
+            AgentExecution(
+                agent_id=3,
+                user_input="Initiate rolling restart of container pods for worker-queue",
+                tool_used="restart_service",
+                tool_arguments={"service": "worker-queue", "strategy": "rolling"},
+                result={"success": True, "status": "ROLLING_RESTART_COMPLETE"}
+            ),
+        ])
 
     db.commit()
     db.close()
