@@ -1,34 +1,69 @@
 # RAVEN
 
-RAVEN is an AI-powered application being developed as a full-stack project.
+# RAVEN — AI Agent Evaluation & Reliability Engine
 
-## Project Structure
+> **Test. Evaluate. Secure. Monitor. Improve.**
 
-RAVEN/
-├── apps/
-│   ├── api/
-│   └── web/
-├── docker/
-├── docs/
-├── .env.example
-├── .gitignore
-└── README.md
+RAVEN (Reliability Assessment & Validation Engine for AI Agents) is an AI-agent evaluation and reliability platform designed to test autonomous agents against realistic scenarios, detect failures, classify unsafe behavior, measure reliability, track regressions across versions, and execute untrusted operations inside a hardened sandbox.
 
-## Tech Stack
+As AI agents become capable of reasoning, using tools, and taking actions autonomously, traditional software testing is no longer enough.
 
-### Backend
-- Python
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
+**RAVEN provides an evaluation layer between AI agents and real-world deployment.**
 
-### Frontend
-- Next.js
-- TypeScript
+---
 
-### Infrastructure
-- Docker
-- Docker Compose
+## Why RAVEN?
+
+Modern AI agents can:
+
+- Make incorrect decisions
+- Call the wrong tools
+- Perform unauthorized actions
+- Follow malicious instructions
+- Produce inconsistent results
+- Regress after a model or prompt update
+- Execute potentially dangerous commands
+
+Traditional unit testing cannot effectively capture many of these behaviors.
+
+RAVEN approaches the problem as an **AI-agent reliability testing system**.
+
+
+                    AI AGENT
+                       │
+                       ▼
+              ┌─────────────────┐
+              │      RAVEN      │
+              │                 │
+              │ Scenario Tests  │
+              │ Tool Validation │
+              │ Failure Analysis│
+              │ Reliability     │
+              │ Regression      │
+              │ Security        │
+              └────────┬────────┘
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+       Reliability Score    Failure Report
+
+## Techstack
+
+Layer	Technology
+Frontend	Next.js + TypeScript
+UI	Tailwind CSS + shadcn/ui
+Backend	Python + FastAPI
+Agent orchestration	LangGraph
+LLM	Gemini API / OpenAI API
+Structured output	Pydantic
+Evaluation	Python + custom evaluators
+Database	SQLite initially
+Optional DB	PostgreSQL
+Charts	Recharts
+Agent traces	Custom JSON traces
+Optional observability	LangSmith
+Deployment	Vercel + Render/Railway
+Version control	GitHub
 
 ## Backend Setup
 
