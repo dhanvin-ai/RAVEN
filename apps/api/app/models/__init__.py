@@ -5,7 +5,6 @@ from app.models.scenario import TestSuite, Scenario
 from app.models.scenario_execution import ScenarioExecution
 from app.models.reliability_report import ReliabilityReport
 from app.models.regression_decision import RegressionDecision
-from app.models.analytics import AnalyticsEvent, AgentViolation, UserIntent, ToolErrorStat
 
 __all__ = [
     "Agent",
@@ -17,8 +16,4 @@ __all__ = [
     "Scenario",
     "ScenarioExecution",
     "ReliabilityReport",
-    "AnalyticsEvent",
-    "AgentViolation",
-    "UserIntent",
-    "ToolErrorStat",
 ]

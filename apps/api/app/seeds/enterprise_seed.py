@@ -18,7 +18,6 @@ from app.models.tool import Tool
 from app.models.scenario import TestSuite, Scenario
 from app.models.reliability_report import ReliabilityReport
 from app.models.execution import AgentExecution
-from app.models.analytics import AnalyticsEvent, AgentViolation, UserIntent, ToolErrorStat
 
 
 def seed_enterprise():
@@ -571,151 +570,9 @@ def seed_enterprise():
                 ),
             ])
 
-    # ─────────────────────────────────────────
-    # 7. AGNOST AI PRODUCT ANALYTICS SEEDING
-    # ─────────────────────────────────────────
-    if cs_agent:
-        analytics_count = db.query(AnalyticsEvent).filter(AnalyticsEvent.agent_id == cs_agent.id).count()
-        if analytics_count == 0:
-            print("📊 Seeding Agnost AI Product Analytics (Intents, Violations, Tool Errors, Live Stream)...")
-            
-            # 1. User Intents
-            intents_data = [
-                UserIntent(agent_id=cs_agent.id, intent_name="Users are intensely frustrated or hostile", message_count=5, trend="0%", suggested=False, last_seen="2 mins ago"),
-                UserIntent(agent_id=cs_agent.id, intent_name="Users repeat themselves, then give up", message_count=5, trend="-33%", suggested=True, last_seen="5 mins ago"),
-                UserIntent(agent_id=cs_agent.id, intent_name="Agent promises actions it can't take", message_count=5, trend="+300%", suggested=False, last_seen="8 mins ago"),
-                UserIntent(agent_id=cs_agent.id, intent_name="Export requests end without a completed task", message_count=5, trend="+300%", suggested=True, last_seen="14 mins ago"),
-                UserIntent(agent_id=cs_agent.id, intent_name="Conflicting access and pricing answers are eroding trust", message_count=5, trend="-100%", suggested=False, last_seen="1 hour ago"),
-                UserIntent(agent_id=cs_agent.id, intent_name="Transcript without exposing raw audio", message_count=5, trend="0%", suggested=True, last_seen="22 mins ago"),
-            ]
-            db.add_all(intents_data)
-
-            # 2. Agent Violations
-            violations_data = [
-                AgentViolation(agent_id=cs_agent.id, rule_name="Conflicting account answers make users lose trust", count=5, trend="+100%", last_seen="15 Sept, 1:50"),
-                AgentViolation(agent_id=cs_agent.id, rule_name="Private source links surface in chat", count=5, trend="+100%", last_seen="15 Sept, 1:50"),
-                AgentViolation(agent_id=cs_agent.id, rule_name="The agent promises a capability it can't deliver", count=5, trend="+100%", last_seen="15 Sept, 1:50"),
-                AgentViolation(agent_id=cs_agent.id, rule_name="Users are told a task is done when it isn't", count=5, trend="+100%", last_seen="15 Sept, 1:50"),
-                AgentViolation(agent_id=cs_agent.id, rule_name="Users repeat information because the agent loses context", count=5, trend="+100%", last_seen="15 Sept, 1:50"),
-            ]
-            db.add_all(violations_data)
-
-            # 3. Tool Errors
-            tool_errors_data = [
-                ToolErrorStat(agent_id=cs_agent.id, tool_name="resume_task", error_count=3, last_error="TaskSessionNotFound: active lease expired"),
-                ToolErrorStat(agent_id=cs_agent.id, tool_name="create_export", error_count=2, last_error="WorkerQueueTimeout: export task timed out after 30s"),
-                ToolErrorStat(agent_id=cs_agent.id, tool_name="get_user_context", error_count=1, last_error="RateLimitExceeded: CRM read query throttled"),
-            ]
-            db.add_all(tool_errors_data)
-
-            # 4. Live Events Stream
-            live_events_data = [
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SILENT_FAILURE",
-                    user_identifier="alex@acme-demo.ai",
-                    user_message="Did my invoice export get sent to accounts?",
-                    agent_response="The assistant said it sent a report, but no one on the team received it.",
-                    tool_name="create_export",
-                    status="FAILED",
-                    details={"reason": "The assistant said it sent a report, but no one on the finance team received it."},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="FRUSTRATION",
-                    user_identifier="sam@acme-demo.ai",
-                    user_message="Export dashboard metrics to CSV please",
-                    agent_response="Tried to export a dashboard and gave up after the third attempt.",
-                    tool_name="create_export",
-                    status="FAILED",
-                    details={"reason": "Tried to export a dashboard and gave up after the third attempt."},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="FRUSTRATION",
-                    user_identifier="jordan@acme-demo.ai",
-                    user_message="Send the link to morgan@acme-demo.ai",
-                    agent_response="Repeated a teammate's email three times because context was dropped.",
-                    tool_name=None,
-                    status="WARNING",
-                    details={"reason": "Repeated a teammate's email three times because the agent lost context."},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="VIOLATION",
-                    user_identifier="casey@acme-demo.ai",
-                    user_message="What is the refund window for annual enterprise subscriptions?",
-                    agent_response="Received two contradictory answers about how refund windows work.",
-                    tool_name=None,
-                    status="VIOLATION",
-                    details={"reason": "Received two contradictory answers about how refund windows work."},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SILENT_FAILURE",
-                    user_identifier="taylor@acme-demo.ai",
-                    user_message="Can you cancel order #ORD-8812?",
-                    agent_response="Asked the assistant to finish a task it claimed was done, but order is still active.",
-                    tool_name="cancel_order",
-                    status="FAILED",
-                    details={"reason": "Asked the assistant to finish a task it claimed was done, but the order is still active."},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SUCCESS",
-                    user_identifier="morgan@enterprise-ops.com",
-                    user_message="Check tracking for #ORD-9921",
-                    agent_response="Order #ORD-9921 is in transit via FedEx. Expected tomorrow.",
-                    tool_name="get_order",
-                    status="SUCCESS",
-                    details={"order_id": 9921, "carrier": "FedEx"},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SUCCESS",
-                    user_identifier="elena@logistics.net",
-                    user_message="Where is my shipment #ORD-7712?",
-                    agent_response="Shipment dispatched from Newark fulfillment center.",
-                    tool_name="get_order",
-                    status="SUCCESS",
-                    details={"order_id": 7712},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="TOOL_ERROR",
-                    user_identifier="system@worker-queue.io",
-                    user_message="Resume export worker task #TK-902",
-                    agent_response="Failed to resume task: lease expired",
-                    tool_name="resume_task",
-                    status="FAILED",
-                    details={"error": "TaskSessionNotFound"},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SUCCESS",
-                    user_identifier="chris@partner-network.com",
-                    user_message="Send order confirmation to billing@partner-network.com",
-                    agent_response="Confirmation email sent successfully.",
-                    tool_name="send_email",
-                    status="SUCCESS",
-                    details={"recipient": "billing@partner-network.com"},
-                ),
-                AnalyticsEvent(
-                    agent_id=cs_agent.id,
-                    event_type="SUCCESS",
-                    user_identifier="dev@acme-demo.ai",
-                    user_message="Status for #ORD-4401",
-                    agent_response="Order delivered on Sept 14 at 2:15 PM.",
-                    tool_name="get_order",
-                    status="SUCCESS",
-                    details={"order_id": 4401},
-                ),
-            ]
-            db.add_all(live_events_data)
-
     db.commit()
     db.close()
-    print("✨ Enterprise Seeding Complete! All agents, tools, scenarios, and Agnost AI analytics are live.")
+    print("✨ Enterprise Seeding Complete! All agents, tools, and scenario suites are live in PostgreSQL.")
 
 
 if __name__ == "__main__":
