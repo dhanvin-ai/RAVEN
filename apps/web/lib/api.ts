@@ -1094,3 +1094,108 @@ export async function runCIPipeline(
     }),
   });
 }
+
+// ============================================================
+// AGNOST AI PRODUCT ANALYTICS & AGENT RELIABILITY
+// ============================================================
+
+export interface AnalyticsEventItem {
+  id: number;
+  agent_id: number;
+  event_type: "SILENT_FAILURE" | "TOOL_ERROR" | "FRUSTRATION" | "VIOLATION" | "SUCCESS" | string;
+  user_identifier: string;
+  user_message: string;
+  agent_response?: string;
+  tool_name?: string;
+  status: "FAILED" | "VIOLATION" | "SUCCESS" | "WARNING" | string;
+  details?: Record<string, any>;
+  created_at: string;
+}
+
+export interface LiveEventsResponse {
+  success: boolean;
+  total: number;
+  events: AnalyticsEventItem[];
+}
+
+export interface UserIntentItem {
+  id: number;
+  name: string;
+  message_count: number;
+  trend: string;
+  suggested: boolean;
+  last_seen: string;
+}
+
+export interface AgentViolationItem {
+  id: number;
+  rule: string;
+  count: number;
+  trend: string;
+  last_seen: string;
+}
+
+export interface ToolErrorItem {
+  id: number;
+  tool: string;
+  count: number;
+  last_error?: string;
+}
+
+export interface AIInsightItem {
+  id: number;
+  user: string;
+  summary: string;
+  event_type: string;
+  status: string;
+  created_at: string;
+}
+
+export interface AgentAnalyticsOverview {
+  success: boolean;
+  agent_id: number;
+  agent_name: string;
+  stats: {
+    total_events: number;
+    total_users: number;
+    total_conversations: number;
+    silent_failures: number;
+    frustration_rate: string;
+  };
+  insights: AIInsightItem[];
+  intents: UserIntentItem[];
+  violations: AgentViolationItem[];
+  tool_errors: ToolErrorItem[];
+}
+
+export async function getLiveAnalyticsEvents(
+  agentId?: number,
+  limit: number = 25
+): Promise<LiveEventsResponse> {
+  const query = new URLSearchParams();
+  if (agentId) query.set("agent_id", agentId.toString());
+  query.set("limit", limit.toString());
+  return request<LiveEventsResponse>(`/analytics/live-events?${query.toString()}`);
+}
+
+export async function getAgentAnalyticsOverview(
+  agentId: number
+): Promise<AgentAnalyticsOverview> {
+  return request<AgentAnalyticsOverview>(`/analytics/agent/${agentId}/overview`);
+}
+
+export async function trackAnalyticsEvent(payload: {
+  agent_id: number;
+  event_type: string;
+  user_identifier?: string;
+  user_message: string;
+  agent_response?: string;
+  tool_name?: string;
+  status?: string;
+  details?: Record<string, any>;
+}): Promise<{ success: boolean; event_id: number }> {
+  return request<{ success: boolean; event_id: number }>("/analytics/track", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}

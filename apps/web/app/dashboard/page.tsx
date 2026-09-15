@@ -49,13 +49,17 @@ import {
   runAgent,
   executeScenarioSuite,
   getAgentScenarios,
+  getAgentAnalyticsOverview,
   type Agent,
   type AgentTool,
   type AgentVersion,
   type Execution,
   type ReliabilityReport,
   type PonytailComparisonResult,
+  type AgentAnalyticsOverview,
 } from "@/lib/api";
+import { AgnostOverview } from "@/components/agnost/AgnostOverview";
+import { LiveEventsTicker } from "@/components/agnost/LiveEventsTicker";
 
 
 const DEFAULT_AGENT_ID = 3;
@@ -64,6 +68,8 @@ export default function DashboardPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [agentSearch, setAgentSearch] = useState("");
+  const [activeDashboardTab, setActiveDashboardTab] = useState<"agnost" | "runtime">("agnost");
+  const [analyticsOverview, setAnalyticsOverview] = useState<AgentAnalyticsOverview | null>(null);
 
   const [tools, setTools] = useState<AgentTool[]>([]);
   const [versions, setVersions] = useState<AgentVersion[]>([]);
@@ -113,6 +119,7 @@ export default function DashboardPage() {
         reliabilityResponse,
         historyResponse,
         ponytailResponse,
+        analyticsResponse,
       ] = await Promise.all([
         getAgentTools(agentId).catch(() => []),
         getAgentVersions(agentId).catch(() => []),
@@ -121,6 +128,10 @@ export default function DashboardPage() {
         getReliabilityHistory(agentId).catch(() => []),
         runPonytailBenchmark(agentId).catch((err) => {
           console.warn("Ponytail benchmark comparison skipped/failed:", err);
+          return null;
+        }),
+        getAgentAnalyticsOverview(agentId).catch((err) => {
+          console.warn("Analytics overview fetch skipped:", err);
           return null;
         }),
       ]);
@@ -132,6 +143,9 @@ export default function DashboardPage() {
       setHistory(historyResponse || []);
       if (ponytailResponse) {
         setPonytailData(ponytailResponse);
+      }
+      if (analyticsResponse) {
+        setAnalyticsOverview(analyticsResponse);
       }
     } catch (err) {
       console.error(err);
@@ -669,9 +683,53 @@ export default function DashboardPage() {
           </section>
 
           {/* ===================================================
-              B. 5 TOP SUMMARY METRICS (With MiniSparklines & MiniDonuts)
+              VIEW MODE SELECTOR: Agnost Product Analytics vs Runtime Telemetry
           =================================================== */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-gray-100 dark:bg-gray-800/60 w-fit">
+            <button
+              type="button"
+              onClick={() => setActiveDashboardTab("agnost")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                activeDashboardTab === "agnost"
+                  ? "bg-white dark:bg-[#151d2e] text-gray-900 dark:text-white shadow-xs"
+                  : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+              }`}
+            >
+              <Sparkles size={14} className="text-purple-600 dark:text-purple-400" />
+              <span>Product Analytics (Agnost AI)</span>
+              <span className="rounded-md bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.2 text-[9px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                Live
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveDashboardTab("runtime")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                activeDashboardTab === "runtime"
+                  ? "bg-white dark:bg-[#151d2e] text-gray-900 dark:text-white shadow-xs"
+                  : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+              }`}
+            >
+              <Terminal size={14} className="text-[#2563eb]" />
+              <span>Runtime &amp; Benchmark Telemetry</span>
+            </button>
+          </div>
+
+          {activeDashboardTab === "agnost" ? (
+            <AgnostOverview
+              overview={analyticsOverview}
+              loading={refreshing}
+              onRefresh={() => selectedAgent && loadAgentDetails(selectedAgent.id)}
+              agentName={selectedAgent?.name}
+              agentId={selectedAgent?.id}
+            />
+          ) : (
+            <>
+              {/* ===================================================
+                  B. 5 TOP SUMMARY METRICS (With MiniSparklines & MiniDonuts)
+              =================================================== */}
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {/* Card 1: Reliability */}
             <div className="rounded-3xl border border-gray-100 dark:border-gray-800/80 bg-white dark:bg-[#151d2e] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex flex-col justify-between transition-all hover:shadow-md">
               <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -1146,6 +1204,8 @@ export default function DashboardPage() {
               )}
             </div>
           </section>
+            </>
+          )}
         </div>
       </div>
 
@@ -1205,6 +1265,10 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      {/* =====================================================
+          PERSISTENT AGNOST AI LIVE EVENTS STREAM TICKER
+      ===================================================== */}
+      <LiveEventsTicker agentId={selectedAgent?.id} />
     </main>
   );
 }

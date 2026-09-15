@@ -6,12 +6,14 @@ import {
   Bot,
   CheckCircle2,
   ChevronRight,
+  Compass,
   Flame,
   LayoutDashboard,
   Menu,
   PanelLeftClose,
   Repeat,
   ScrollText,
+  ShieldAlert,
   X,
 } from "lucide-react";
 import {
@@ -36,6 +38,20 @@ const PRIMARY_NAV: NavItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Intents",
+    href: "/intents",
+    icon: Compass,
+    badge: "AI",
+    badgeColor: "bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400",
+  },
+  {
+    label: "Violations",
+    href: "/violations",
+    icon: ShieldAlert,
+    badge: "5",
+    badgeColor: "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400",
   },
   {
     label: "Agents",

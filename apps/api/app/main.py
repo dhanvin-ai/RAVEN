@@ -36,13 +36,17 @@ from app.routes import multiturn
 from app.routes import trace
 from app.routes import benchmark
 from app.routes import ci
+from app.routes import analytics
 
 
 # ─────────────────────────────────────────────
 # CREATE DATABASE TABLES
 # ─────────────────────────────────────────────
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Notice: Table creation deferred or using existing schema: {e}")
 
 # Ensure ponytail_mode column exists for all agents
 try:
@@ -57,11 +61,13 @@ try:
     from app.database import SessionLocal
     from app.models.agent import Agent
     from app.models.reliability_report import ReliabilityReport
+    from app.models.analytics import AnalyticsEvent
     with SessionLocal() as db:
         agent_count = db.query(Agent).count()
         report_count = db.query(ReliabilityReport).count()
+        analytics_count = db.query(AnalyticsEvent).count()
         cs_agent = db.query(Agent).filter(Agent.name.ilike("%customer support%")).first()
-        if agent_count == 0 or report_count == 0 or not cs_agent:
+        if agent_count == 0 or report_count == 0 or not cs_agent or analytics_count == 0:
             from app.seeds.enterprise_seed import seed_enterprise
             seed_enterprise()
 except Exception as e:
@@ -114,6 +120,7 @@ app.include_router(multiturn.router)
 app.include_router(trace.router)
 app.include_router(benchmark.router)
 app.include_router(ci.router)
+app.include_router(analytics.router)
 
 
 # ─────────────────────────────────────────────
