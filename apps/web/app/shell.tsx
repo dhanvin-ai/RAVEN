@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   Bot,
   CheckCircle2,
   ChevronRight,
@@ -36,6 +37,13 @@ const PRIMARY_NAV: NavItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Observe",
+    href: "/observe",
+    icon: Activity,
+    badge: "New",
+    badgeColor: "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400",
   },
   {
     label: "Agents",

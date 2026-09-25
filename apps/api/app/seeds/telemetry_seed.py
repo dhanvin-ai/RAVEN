@@ -80,6 +80,41 @@ def seed_telemetry() -> str | None:
                      name="conversation.completed",
                      payload={"conversation": "seed-conv-0001"},
                      conversation_ext_id="seed-conv-0001")
+
+        # A second, failing conversation: refund tool errors twice, user repeats.
+        ingest_trace(
+            db, project, env,
+            trace_id="seed-trace-0002",
+            conversation_ext_id="seed-conv-0002",
+            user_id="seed-user-2",
+            agent_version="1.0.0",
+            model="gpt-4o-mini",
+            provider="openai",
+            status="error",
+            error_type="ToolError",
+            error_message="refund_order failed: card_refund_failed",
+            started_at=datetime.datetime.utcnow() - datetime.timedelta(hours=2),
+            ended_at=datetime.datetime.utcnow() - datetime.timedelta(hours=2) + datetime.timedelta(seconds=9),
+            spans=[
+                {"span_id": "seed-span-2-llm", "kind": "llm", "name": "llm.plan",
+                 "status": "ok",
+                 "attributes": {"input": "refund my order ORD-5510 now"},
+                 "model": {"provider": "openai", "model": "gpt-4o-mini",
+                           "input_tokens": 96, "output_tokens": 20}},
+                {"span_id": "seed-span-2-tool", "parent_span_id": "seed-span-2-llm",
+                 "kind": "tool", "name": "tool.refund_order", "status": "error",
+                 "error_type": "ToolError", "error_message": "card_refund_failed",
+                 "tool": {"tool_name": "refund_order",
+                          "arguments": {"order_id": "ORD-5510"},
+                          "result": {"error": "card_refund_failed"},
+                          "outcome": "error"}},
+            ],
+        )
+        ingest_event(db, project, env, event_id="seed-event-0002", kind="user.frustration",
+                     name="user.frustration",
+                     payload={"conversation": "seed-conv-0002",
+                              "reason": "user repeated refund request 3 times"},
+                     conversation_ext_id="seed-conv-0002")
         db.commit()
         print("📡 Telemetry seed complete: org 'RAVEN Dev' / project 'support-copilot'.")
         print(f"🔑 DEV API KEY (shown once): {plaintext}")
