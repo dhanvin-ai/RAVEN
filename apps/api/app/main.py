@@ -18,18 +18,6 @@ from app.models import (
     TestSuite,
     Scenario,
     ReliabilityReport,
-    Organization,
-    Project,
-    Environment,
-    ProjectAPIKey,
-    EndUser,
-    Conversation,
-    Trace,
-    Span,
-    TelemetryEvent,
-    ToolCall,
-    ModelCall,
-    IngestionFailure,
 )
 
 # ─────────────────────────────────────────────
@@ -48,7 +36,6 @@ from app.routes import multiturn
 from app.routes import trace
 from app.routes import benchmark
 from app.routes import ci
-from app.routes import ingestion
 
 
 # ─────────────────────────────────────────────
@@ -77,14 +64,6 @@ try:
         if agent_count == 0 or report_count == 0 or not cs_agent:
             from app.seeds.enterprise_seed import seed_enterprise
             seed_enterprise()
-        # Phase 1/2 telemetry scope: seed only when telemetry tables are empty.
-        try:
-            from app.models.telemetry import Organization as TelemetryOrg
-            if db.query(TelemetryOrg).count() == 0:
-                from app.seeds.telemetry_seed import seed_telemetry
-                seed_telemetry()
-        except Exception as seed_exc:
-            print(f"Startup telemetry-seeding notice: {seed_exc}")
 except Exception as e:
     print(f"Startup auto-seeding notice: {e}")
 
@@ -135,7 +114,6 @@ app.include_router(multiturn.router)
 app.include_router(trace.router)
 app.include_router(benchmark.router)
 app.include_router(ci.router)
-app.include_router(ingestion.router)
 
 
 # ─────────────────────────────────────────────
