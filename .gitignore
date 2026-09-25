@@ -38,7 +38,6 @@ out/
 # Build files
 dist/
 build/
-*.egg-info/
 
 # Local database / temporary files
 *.sqlite3
