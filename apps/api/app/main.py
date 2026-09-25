@@ -49,7 +49,6 @@ from app.routes import trace
 from app.routes import benchmark
 from app.routes import ci
 from app.routes import ingestion
-from app.routes import observe
 
 
 # ─────────────────────────────────────────────
@@ -137,7 +136,6 @@ app.include_router(trace.router)
 app.include_router(benchmark.router)
 app.include_router(ci.router)
 app.include_router(ingestion.router)
-app.include_router(observe.router)
 
 
 # ─────────────────────────────────────────────
